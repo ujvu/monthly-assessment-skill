@@ -114,3 +114,5 @@ bash ~/.hermes/skills/productivity/monthly-assessment/scripts/install_from_githu
 ```bash
 curl -fsSL https://raw.githubusercontent.com/ujvu/monthly-assessment-skill/main/scripts/install_from_github.sh | bash
 ```
+
+更完整的智能体专用提示词见 [`AGENT_PROMPT.md`](./AGENT_PROMPT.md)。
