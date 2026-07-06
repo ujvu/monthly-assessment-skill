@@ -1,10 +1,10 @@
 ---
 name: monthly-assessment
-description: 学前教育场景月度考核工作流：基于 OfficeCLI 的文档生成（游戏观察记录、运动观察记录、半日备课）+ Excel 考核表计算（奖励、扣款、补贴）
+description: 学前教育场景月度考核工作流：基于 OfficeCLI 的文档生成（游戏观察记录、运动观察记录、半日备课）
 license: MIT
 metadata:
   hermes:
-    related_skills: [officecli, officecli-recipes, document-processing]
+    related_skills: [officecli, officecli-recipes, document-processing, pdf-tools]
 ---
 
 # 月考核（匿名示例）v2 — OfficeCLI 版
@@ -15,7 +15,6 @@ metadata:
 
 - "月考核" / "月度考核" / "考核文档"
 - "游戏观察记录" / "运动观察记录" / "半日活动备课"
-- "考核奖励" / "考核扣款" / "补贴" / "顶班费"
 
 ## 目录结构
 
@@ -23,7 +22,6 @@ metadata:
 monthly-assessment/
 ├── SKILL.md                    ← 本文件：总览和索引
 ├── references/
-│   ├── 月考核计算.md            ← Excel 考核表计算规则（2026年新结构）
 │   ├── 月考核作业.md            ← 文档生成的 officecli 工作流（v2 全新）
 │   ├── 月考核-匿名运动观察案例.md
 │   └── officecli-v2.2-升级说明.md  ← gen_batch.py 智能清空升级背景 (2026-06-13)
@@ -44,7 +42,7 @@ monthly-assessment/
 | 命令行友好度 | 50 行 Python | **1-3 行 shell** |
 | 与共享盘死锁 | 频繁 | 同样适用 O_NONBLOCK 读取（见 v1 文档） |
 
-## 两大工作流
+## 核心工作流
 
 ### 工作流一：文档生成（officecli）
 
@@ -80,24 +78,35 @@ officecli view motion.docx screenshot -o /tmp/preview.png
 
 > 💡 **遇到 officecli 环境问题**（OOM、codesign 卡死、空段落、Excel range 语法）→ 切到 `officecli-recipes` skill，那里有一份**这个 macOS 环境的实战坑位清单**（坑 1-9）。
 
-### 工作流二：Excel 考核表计算（保持原样）
+## 辅助技能组合
 
-修改月考核相关 Excel 文件（2026 年新结构），用 Python `openpyxl` 计算奖励、扣款、补贴等：
+这个技能建议和以下本地已安装技能配合使用：
 
-- 在编考核表（月考核 + 月绩效）
-- 月考核表（园区 A / 园区 B / 园区 C）
-- 非编考核表（劳务派遣）
-- 代课考核表
+| 技能 | 角色 | 适用场景 |
+|---|---|---|
+| `officecli` | 主文档编辑引擎 | 直接创建、读取、修改 `.docx`，处理表格、段落、格式 |
+| `officecli-recipes` | 本机环境配方库 | 遇到共享盘死锁、超大文档、首跑卡死、批量填表时优先参考 |
+| `document-processing` | 文档处理兜底技能 | 当需要 `python-docx`、文档解析、格式转换、共享盘低层读取时使用 |
+| `pdf-tools` | PDF 补充技能 | 当月考核材料来自 PDF、扫描件或需要 OCR / 提取文字时使用 |
 
-**2026年结构要点**（与 v1 一致）：
-- 教师月考核基数：1000元/月
-- 后勤月考核基数：900元/月
-- 请假扣款基数：3800元（应发）+ 1000元（月考核）
-- 每月工作天数：20.67天
+### 推荐协作顺序
 
-> 💡 **未来考虑**：v3 可用 `officecli` 直接读/写 Excel（`xlsx add cell --ref A1 --prop value=...`），但当前 v2 暂保留 openpyxl 写法以最小化风险。
+1. **月考核主流程**：先读本技能，明确当前任务属于观察记录还是备课。
+2. **Word 编辑与生成**：需要改 `.docx` 时优先调用 `officecli`。
+3. **环境故障与实战坑位**：如果 `officecli` 在本机表现异常，立刻切到 `officecli-recipes`。
+4. **共享盘 / 解析 / python-docx 兜底**：如果涉及共享盘死锁、格式转换、结构化解析，调用 `document-processing`。
+5. **PDF 来源材料**：如果输入文件是 PDF 或扫描件，先过 `pdf-tools` 再回到本技能流程。
 
-See `references/月考核计算.md` for full calculation rules.
+### 对其他智能体的读取建议
+
+如果你是其他智能体，推荐按这个顺序读取：
+
+1. `monthly-assessment/SKILL.md`
+2. `monthly-assessment/references/月考核作业.md`
+3. `officecli/SKILL.md`
+4. `officecli-recipes/SKILL.md`
+5. `document-processing/SKILL.md`
+6. `pdf-tools/SKILL.md`（仅当输入是 PDF / 扫描件时）
 
 ## ⚠️ 常见坑（2026-06 v2 实战后补，v2.2 修复智能清空）
 
@@ -156,4 +165,3 @@ officecli view /tmp/test-motion.docx screenshot -o /tmp/preview.png
 - [x] 现有共享盘 docx 的安全读取（O_NONBLOCK 仍适用）
 - [x] 写入后的视觉验证（screenshot）
 - [ ] 半日备课 27 行完整命令（v2.1 待补）
-- [ ] Excel 计算也迁到 officecli（v3 计划）
