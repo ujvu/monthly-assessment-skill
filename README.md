@@ -50,6 +50,8 @@ bash -c "$(curl -fsSL https://raw.githubusercontent.com/ujvu/monthly-assessment-
 
 完整说明见 [`INSTALL.md`](./INSTALL.md)。
 
+给其他智能体直接使用的提示词见 [`AGENT_PROMPT.md`](./AGENT_PROMPT.md)。
+
 ## 快速开始
 
 ```bash
